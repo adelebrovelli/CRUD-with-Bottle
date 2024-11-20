@@ -160,8 +160,8 @@
             <h2>Adicionar nova consulta</h2>
             <form action="/create" method="post">
                 <input type="text" name="fk_medico_crm" maxlength="8" placeholder="CRM do Médico*" required><br>
-                <input type="text" name="fk_medico_fk_pessoa_cpf" maxlength="11" placeholder="CPF do Médico"><br>
-                <input type="text" name="fk_paciente_id_paciente" placeholder="ID do Paciente"><br>
+                <input type="text" name="fk_medico_fk_pessoa_cpf" maxlength="11" placeholder="CPF do Médico*" required><br>
+                <input type="text" name="fk_paciente_id_paciente" placeholder="ID do Paciente*" required><br>
                 <input type="text" name="fk_paciente_fk_pessoa_cpf" maxlength="11" placeholder="CPF do Paciente*" required><br>
                 <input type="number" name="sala" placeholder="Sala" min="1" required><br>
                 <input type="date" name="data" required><br>
