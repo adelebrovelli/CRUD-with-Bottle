@@ -33,6 +33,22 @@ def addMedicalAppointments(fk_medico_crm, fk_medico_fk_pessoa_cpf, fk_paciente_i
         cursor.close()
         conn.close()
 
+def removeMedicalAppointments(data, fk_medico_crm):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            DELETE FROM ent_consulta_consulta WHERE data = %s AND fk_medico_crm = %s;
+        ''', (data, fk_medico_crm))
+        conn.commit()
+        print("Consulta removida com sucesso")
+    except Exception as e:
+        print(f"Erro ao remover consulta: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
 @route('/')
 def home():
     tabelaConsultas = showMedicalAppointments()
@@ -50,6 +66,15 @@ def add():
         addMedicalAppointments(fk_medico_crm, fk_medico_fk_pessoa_cpf, fk_paciente_id_paciente, fk_paciente_fk_pessoa_cpf, sala, data)
 
         redirect('/')
+
+@route('/remove', method =['GET', 'POST'])
+def remove():
+    fk_medico_crm = request.forms.get('fk_medico_crm')
+    data = request.forms.get('data')
+
+    removeMedicalAppointments(data, fk_medico_crm)
+
+    redirect('/')
 
 if __name__ == '__main__':
     run(host='localhost', port=8080, debug=False) # lembrar de retirar e usar apenas para testes

@@ -152,7 +152,8 @@
     </table>
 
     <ul>
-        <li><button onclick="openModal()">+</button></li>
+        <li><button onclick="openAddModal()">+</button></li>
+        <li><button onclick="openRemoveModal()">-</button></li>
     </ul>
 
     <div class="modal" id="addModal">
@@ -166,19 +167,38 @@
                 <input type="number" name="sala" placeholder="Sala" min="1" required><br>
                 <input type="date" name="data" required><br>
                 <p>*Campos obrigatórios</p style="color:red">
-                <button type="Adicionar">Adicionar</button>
-                <button type="button" class="close-modal" onclick="closeModal()">Fechar</button>
+                <button>Adicionar</button>
+                <button type="button" class="close-modal" onclick="closeAddModal()">Fechar</button>
+            </form>
+        </div> 
+    </div>
+    <div class="modal" id="removeModal">
+        <div class="modal-content">
+            <h2>Remover consulta</h2>
+            <form action="/remove" method="post">
+                <input type="text" name="fk_medico_crm" maxlength="8" placeholder="CRM do Médico*" required><br>
+                <input type="date" name="data" placeholder="Data*" required><br>
+                <p>*Campos obrigatórios</p style="color:red">
+                <button>Remover</button>
+                <button type="button" class="close-modal" onclick="closeRemoveModal()">Fechar</button>
             </form>
         </div> 
     </div>
 
     <script>
-        function openModal() {
+        function openAddModal() {
             document.getElementById('addModal').style.display = 'flex';
         }
 
-        function closeModal() {
+        function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
+        }
+        function openRemoveModal() {
+            document.getElementById('removeModal').style.display = 'flex';
+        }
+
+        function closeRemoveModal() {
+            document.getElementById('removeModal').style.display = 'none';
         }
     </script>
 </body>
