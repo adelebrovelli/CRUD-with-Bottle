@@ -8,6 +8,29 @@ def get_db_connection(): # me conectando no postgres turma
     )
     return conn
 
+
+PASSWORD_TABLES = {
+    "adele123": "/MedicalAppointments",
+    "duda123": "/EventSubscriptions",
+    "bruna123": "/Events",
+    "sergio123": "/Orders"
+}
+
+def credentials(password):
+    return PASSWORD_TABLES.get(password)
+
+@route('/', method=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        password = request.forms.get('password')  
+        table = credentials(password)  
+        if table:
+            redirect(f'{table}')  
+        else:
+            return "<p>Senha incorreta. Tente novamente.</p>"
+
+    return template('views/login.tpl')
+
 def showMedicalAppointments():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -88,12 +111,12 @@ def editMedicalAppointments(data, updates):
         print("Nenhum campo para atualizar")
 
 
-@route('/')
-def home():
+@route('/MedicalAppointments')
+def homeMedicalAppointments():
     tabelaConsultas = showMedicalAppointments()
     return template('views/medicalAppointments.tpl', tabelaConsultas=tabelaConsultas)
 
-@route('/create', method=['GET', 'POST'])
+@route('/createMedicalAppointments', method=['GET', 'POST'])
 def add():
         fk_medico_crm = request.forms.get('fk_medico_crm')
         fk_medico_fk_pessoa_cpf = request.forms.get('fk_medico_fk_pessoa_cpf')
@@ -106,7 +129,7 @@ def add():
 
         redirect('/')
 
-@route('/remove', method =['GET', 'POST'])
+@route('/removeMedicalAppointments', method =['GET', 'POST'])
 def remove():
     fk_medico_crm = request.forms.get('fk_medico_crm')
     data = request.forms.get('data')
@@ -115,7 +138,7 @@ def remove():
 
     redirect('/')
 
-@route('/edit', method=['POST'])
+@route('/editMedicalAppointments', method=['POST'])
 def edit():
     data = request.forms.get('data')
     updates = {
@@ -133,6 +156,117 @@ def edit():
 
     redirect('/')
 
+def showEventSubscriptions():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM E_Assoc_Inscricao;')
+    resultados = cursor.fetchall()
+    conn.close()
+    resultados_formatados = []
+    for inscricao in resultados:
+        nova_inscricao = []
+        for campo in inscricao:
+            if isinstance(campo, (datetime.date, datetime.datetime)):
+                nova_inscricao.append(str(campo)) 
+            else:
+                nova_inscricao.append(campo)
+        resultados_formatados.append(nova_inscricao)
+    
+    return resultados_formatados
+
+
+@route('/EventSubscriptions')
+def view_inscricoes():
+    tabelaInscricoes = showEventSubscriptions()
+    return template('views/Subscriptions.tpl', tabelaInscricoes=tabelaInscricoes)
+
+def addEventSubscriptions(fk_evento_data_evento, fk_participante_cpf):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO E_Assoc_Inscricao 
+            (fk_Evento_Data_Evento, fk_Participante_fk_Pessoa_CPF)
+            VALUES (%s, %s) RETURNING ID_Inscricao; 
+        ''', (fk_evento_data_evento, fk_participante_cpf))
+        new_id = cursor.fetchone()[0]  
+        conn.commit()
+        print(f"Inscrição adicionada com sucesso! ID: {new_id}")
+    except Exception as e:
+        print(f"Erro ao adicionar inscrição: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@route('/createEventSubscriptions', method=['POST'])
+def add_inscricao():
+    fk_evento_data_evento = request.forms.get('fk_evento_data_evento')
+    fk_participante_cpf = request.forms.get('fk_participante_cpf')
+
+    addEventSubscriptions(fk_evento_data_evento, fk_participante_cpf)
+    redirect('/EventSubscriptions')
+
+
+def removeEventSubscriptions(id_inscricao):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM E_Assoc_Inscricao WHERE ID_Inscricao = %s', (id_inscricao,))
+        conn.commit()
+    except Exception as e:
+        print(f"Erro ao remover inscrição: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+@route('/removeEventSubscriptions', method=['POST'])
+def delete_inscricao():
+    id_inscricao = request.forms.get('id_inscricao')
+    removeEventSubscriptions(id_inscricao)
+    redirect('/EventSubscriptions')
+
+
+def editEventSubscriptions(id_inscricao, updates):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    values = []
+    valuesFiltered = []
+    for column, value in updates.items():
+        if value is not None:
+            valuesFiltered.append(f"{column} = %s")
+            values.append(value)
+
+    if valuesFiltered:
+        query = f"UPDATE E_Assoc_Inscricao SET {','.join(valuesFiltered)} WHERE ID_Inscricao = %s"
+        values.append(id_inscricao)
+
+        try:
+            cursor.execute(query, tuple(values))
+            conn.commit()
+        except Exception as e:
+            print(f"Erro ao editar inscrição: {e}")
+            conn.rollback()
+        finally:
+            cursor.close()
+            conn.close()
+
+@route('/editEventSubscriptions', method=['POST'])
+def edit_inscricao():
+    id_inscricao = request.forms.get('id_inscricao')
+    updates = {
+        "fk_Evento_Data_Evento": request.forms.get('fk_evento_data_evento'),
+        "fk_Participante_fk_Pessoa_CPF": request.forms.get('fk_participante_cpf'),
+        "Frequencia": request.forms.get('frequencia') == 'on',
+        "satisfacao_Inscrito": request.forms.get('satisfacao')
+    }
+    updates = {k: v for k, v in updates.items() if v}
+    editEventSubscriptions(id_inscricao, updates)
+    redirect('/EventSubscriptions')
+
+
 
 if __name__ == '__main__':
-    run(host='localhost', port=8080, debug=False) # lembrar de retirar e usar apenas para testes
+    run(host='localhost', port=8080, debug=True, reloader=True) # lembrar de retirar e usar apenas para testes

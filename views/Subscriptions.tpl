@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Histórico de Consultas</title>
+    <title>Histórico de Inscrições</title>
     <style>
         * {
             margin: 0;
@@ -131,82 +131,78 @@
 </head>
 <body>
     <header>
-        <h1>Histórico de Consultas</h1>
+        <h1>Histórico de Inscrições</h1>
     </header>
 
     <table border="1">
         <tr>
-            <th>CRM do Médico</th>
-            <th>CPF do Médico</th>
-            <th>ID do Paciente</th>
-            <th>CPF do Paciente</th>
-            <th>Sala</th>
-            <th>Data</th>
+            <th>Data do Evento</th>
+            <th>CPF do Participante</th>
+            <th>ID da Inscrição</th>
+            <th>Frequência</th>
+            <th>Satisfação</th>
             <th> </th>
         </tr>
-        % for consulta in tabelaConsultas:
+        % for inscricao in tabelaInscricoes:
             <tr>
-                % for campo in consulta:
+                % for campo in inscricao:
                     <td>{{campo}}</td>
                 % end
-                 <td> <button onclick="openEditModal({{consulta}})">Editar</button> </td>
+                <td>
+                    <button onclick="openEditModal({{inscricao}})">Editar</button>
+                </td>
             </tr>
         % end
     </table>
 
     <ul>
-        <li><button onclick="openAddModal()">+</button></li>
-        <li><button onclick="openRemoveModal()">-</button></li>
+        <li><button onclick="openAddModal()">Adicionar</button></li>
+        <li><button onclick="openRemoveModal()">Remover</button></li>
     </ul>
 
     <div class="modal" id="addModal">
         <div class="modal-content">
-            <h2>Adicionar nova consulta</h2>
-            <form action="/createMedicalAppointments" method="post">
-                <input type="text" name="fk_medico_crm" maxlength="8" placeholder="CRM do Médico*" required><br>
-                <input type="text" name="fk_medico_fk_pessoa_cpf" maxlength="11" placeholder="CPF do Médico*" required><br>
-                <input type="text" name="fk_paciente_id_paciente" placeholder="ID do Paciente*" required><br>
-                <input type="text" name="fk_paciente_fk_pessoa_cpf" maxlength="11" placeholder="CPF do Paciente*" required><br>
-                <input type="number" name="sala" placeholder="Sala" min="1" required><br>
-                <input type="date" name="data" required><br>
-                <p>*Campos obrigatórios</p style="color:red">
-                <button>Adicionar</button>
+            <h2>Adicionar nova inscrição</h2>
+            <form action="/createEventSubscriptions" method="post">
+                <input type="date" name="fk_evento_data_evento" placeholder="Data do Evento*" required><br>
+                <input type="text" name="fk_participante_cpf" maxlength="11" placeholder="CPF do Participante*" required><br>
+                <p>*Campos obrigatórios</p>
+                <button type="submit">Adicionar</button>
                 <button type="button" class="close-modal" onclick="closeAddModal()">Fechar</button>
             </form>
-        </div> 
+        </div>
     </div>
+
     <div class="modal" id="removeModal">
         <div class="modal-content">
-            <h2>Remover consulta</h2>
-            <form action="/removeMedicalAppointments" method="post">
-                <input type="text" name="fk_medico_crm" maxlength="8" placeholder="CRM do Médico*" required><br>
-                <input type="date" name="data" placeholder="Data*" required><br>
-                <p>*Campos obrigatórios</p style="color:red">
-                <button>Remover</button>
+            <h2>Remover inscrição</h2>
+            <form action="/removeEventSubscriptions" method="post">
+                <input type="text" name="id_inscricao" maxlength="255" placeholder="ID da Inscrição*" required><br>
+                <p>*Campos obrigatórios</p>
+                <button type="submit">Remover</button>
                 <button type="button" class="close-modal" onclick="closeRemoveModal()">Fechar</button>
             </form>
-        </div> 
+        </div>
     </div>
-    <div class="modal" id="editModal">
-    <div class="modal-content">
-        <h2>Editar consulta</h2>
-        <form action="/editMedicalAppointments" method="post">
-            <input type="hidden" name="data" id="editData">
-            <input type="text" name="fk_medico_crm" id="editFkMedicoCrm" maxlength="8" placeholder="CRM do Médico"><br>
-            <input type="text" name="fk_medico_fk_pessoa_cpf" id="editFkMedicoPessoaCpf" maxlength="11" placeholder="CPF do Médico"><br>
-            <input type="text" name="fk_paciente_id_paciente" id="editFkPacienteId" placeholder="ID do Paciente"><br>
-            <input type="text" name="fk_paciente_fk_pessoa_cpf" id="editFkPacientePessoaCpf" maxlength="11" placeholder="CPF do Paciente"><br>
-            <input type="number" name="sala" id="editSala" placeholder="Sala" min="1"><br>
-            <p>Onde não existirem alterações, o campo deve ser nulo </p>
-            <button>Salvar Alterações</button>
-            <button type="button" class="close-modal" onclick="closeEditModal()">Fechar</button>
-        </form>
-    </div>
-</div>
 
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>Editar inscrição</h2>
+            <form action="/editEventSubscriptions" method="post">
+                <input type="hidden" name="id_inscricao" id="editIdInscricao">
+                <input type="date" name="fk_evento_data_evento" id="editEventoData" placeholder="Data do Evento"><br>
+                <input type="text" name="fk_participante_cpf" id="editParticipanteCpf" maxlength="11" placeholder="CPF do Participante"><br>
+                <label>
+                    <input type="checkbox" name="frequencia" id="editFrequencia"> Presente no Evento?
+                </label><br>
+                <input type="number" name="satisfacao" id="editSatisfacao" min="1" max="5" placeholder="Satisfação (1 a 5)"><br>
+                <button type="submit">Salvar Alterações</button>
+                <button type="button" class="close-modal" onclick="closeEditModal()">Fechar</button>
+            </form>
+        </div>
+    </div>
 
     <script>
-    
         function openAddModal() {
             document.getElementById('addModal').style.display = 'flex';
         }
@@ -214,6 +210,7 @@
         function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
         }
+
         function openRemoveModal() {
             document.getElementById('removeModal').style.display = 'flex';
         }
@@ -222,20 +219,20 @@
             document.getElementById('removeModal').style.display = 'none';
         }
 
-        function openEditModal(consulta) {
-            document.getElementById('editFkMedicoCrm').value = consulta[0];
-            document.getElementById('editFkMedicoPessoaCpf').value = consulta[1];
-            document.getElementById('editFkPacienteId').value = consulta[2];
-            document.getElementById('editFkPacientePessoaCpf').value = consulta[3];
-            document.getElementById('editSala').value = consulta[4];
-            document.getElementById('editData').value = consulta[5];
+        function openEditModal(inscricao) {
+            document.getElementById('editIdInscricao').value = inscricao[2]; 
+            document.getElementById('editEventoData').value = inscricao[0]; 
+            document.getElementById('editParticipanteCpf').value = inscricao[1];
+            document.getElementById('editFrequencia').checked = inscricao[3]; 
+            document.getElementById('editSatisfacao').value = inscricao[4];
 
-        document.getElementById('editModal').style.display = 'flex';
-    }
+            document.getElementById('editModal').style.display = 'flex';
+        }
 
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
-}
+        }
     </script>
 </body>
+
 </html>
