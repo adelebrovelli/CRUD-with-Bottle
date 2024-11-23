@@ -67,7 +67,7 @@
             padding: 0;
         }
 
-        ul li a, ul li button {
+        ul li a, ul li button, table tr td button {
             display: inline-block;
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -110,6 +110,7 @@
             padding: 10px;
             width: 90%;
             font-size: 1rem;
+            border-radius: 10px;
         }
 
         .close-modal {
@@ -117,7 +118,7 @@
             color: white;
             border: none;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             margin-top: 10px;
@@ -141,12 +142,14 @@
             <th>CPF do Paciente</th>
             <th>Sala</th>
             <th>Data</th>
+            <th> </th>
         </tr>
         % for consulta in tabelaConsultas:
             <tr>
                 % for campo in consulta:
                     <td>{{campo}}</td>
                 % end
+                 <td> <button onclick="openEditModal({{consulta}})">Editar</button> </td>
             </tr>
         % end
     </table>
@@ -184,8 +187,26 @@
             </form>
         </div> 
     </div>
+    <div class="modal" id="editModal">
+    <div class="modal-content">
+        <h2>Editar consulta</h2>
+        <form action="/edit" method="post">
+            <input type="hidden" name="data" id="editData">
+            <input type="text" name="fk_medico_crm" id="editFkMedicoCrm" maxlength="8" placeholder="CRM do Médico"><br>
+            <input type="text" name="fk_medico_fk_pessoa_cpf" id="editFkMedicoPessoaCpf" maxlength="11" placeholder="CPF do Médico"><br>
+            <input type="text" name="fk_paciente_id_paciente" id="editFkPacienteId" placeholder="ID do Paciente"><br>
+            <input type="text" name="fk_paciente_fk_pessoa_cpf" id="editFkPacientePessoaCpf" maxlength="11" placeholder="CPF do Paciente"><br>
+            <input type="number" name="sala" id="editSala" placeholder="Sala" min="1"><br>
+            <p>Onde não existirem alterações, o campo deve ser nulo </p>
+            <button>Salvar Alterações</button>
+            <button type="button" class="close-modal" onclick="closeEditModal()">Fechar</button>
+        </form>
+    </div>
+</div>
+
 
     <script>
+    
         function openAddModal() {
             document.getElementById('addModal').style.display = 'flex';
         }
@@ -200,6 +221,21 @@
         function closeRemoveModal() {
             document.getElementById('removeModal').style.display = 'none';
         }
+
+        function openEditModal(consulta) {
+            document.getElementById('editFkMedicoCrm').value = consulta[0];
+            document.getElementById('editFkMedicoPessoaCpf').value = consulta[1];
+            document.getElementById('editFkPacienteId').value = consulta[2];
+            document.getElementById('editFkPacientePessoaCpf').value = consulta[3];
+            document.getElementById('editSala').value = consulta[4];
+            document.getElementById('editData').value = consulta[5];
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+}
     </script>
 </body>
 </html>
