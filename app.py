@@ -2,7 +2,6 @@ from bottle import route, run, template, request, redirect
 import datetime
 import psycopg2
 
-
 def get_db_connection(): # me conectando no postgres turma
     conn = psycopg2.connect(database="dbequilibrium", user="postgres", password="9504", host='localhost', port=5432
     )
@@ -39,14 +38,16 @@ def showMedicalAppointments():
     conn.close()
 
     resultados_formatados = []
-    for consulta in resultados:
-        nova_consulta = []
-        for campo in consulta:
-            if isinstance(campo, (datetime.date, datetime.datetime)):
-                nova_consulta.append(str(campo)) 
+    for inscricao in resultados:
+        nova_inscricao = []
+        for campo in inscricao:
+            if isinstance(campo, bool): 
+                nova_inscricao.append('true' if campo else 'false')
+            elif isinstance(campo, (datetime.date, datetime.datetime)):
+                nova_inscricao.append(str(campo)) 
             else:
-                nova_consulta.append(campo)
-        resultados_formatados.append(nova_consulta)
+                nova_inscricao.append(campo)
+        resultados_formatados.append(nova_inscricao)
     
     return resultados_formatados
 

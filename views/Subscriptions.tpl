@@ -1,3 +1,4 @@
+% import json
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -149,7 +150,7 @@
                     <td>{{campo}}</td>
                 % end
                 <td>
-                    <button onclick="openEditModal({{inscricao}})">Editar</button>
+                    <button onclick="openEditModal({{json.dumps(inscricao)}})">Editar</button>
                 </td>
             </tr>
         % end
@@ -219,13 +220,12 @@
             document.getElementById('removeModal').style.display = 'none';
         }
 
-        function openEditModal(inscricao) {
+        function openEditModal(inscricao) { 
             document.getElementById('editIdInscricao').value = inscricao[2]; 
             document.getElementById('editEventoData').value = inscricao[0]; 
             document.getElementById('editParticipanteCpf').value = inscricao[1];
-            document.getElementById('editFrequencia').checked = inscricao[3]; 
+            document.getElementById('editFrequencia').checked = inscricao[3] === true; 
             document.getElementById('editSatisfacao').value = inscricao[4];
-
             document.getElementById('editModal').style.display = 'flex';
         }
 

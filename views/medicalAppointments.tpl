@@ -155,8 +155,8 @@
     </table>
 
     <ul>
-        <li><button onclick="openAddModal()">+</button></li>
-        <li><button onclick="openRemoveModal()">-</button></li>
+        <li><button onclick="openAddModal()">Adicionar</button></li>
+        <li><button onclick="openRemoveModal()">Remover</button></li>
     </ul>
 
     <div class="modal" id="addModal">
