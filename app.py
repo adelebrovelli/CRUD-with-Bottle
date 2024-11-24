@@ -376,7 +376,117 @@ def edit_event():
     editEvent(data_evento, updates)
     redirect('/Events')
 
+def showOrders():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Pedido;')
+    resultados = cursor.fetchall()
+    conn.close()
 
+
+    resultados_formatados = []
+    for pedido in resultados:
+        nova_pedido = []
+        for campo in pedido:
+            if isinstance(campo, bool): 
+                nova_pedido.append('true' if campo else 'false')
+            elif isinstance(campo, (datetime.date, datetime.datetime)):
+                nova_pedido.append(str(campo))
+            else:
+                nova_pedido.append(campo)
+        resultados_formatados.append(nova_pedido)
+    
+    return resultados_formatados
+
+def addOrder(id_pedido, preco_t, delivery, fk_data_data_pk):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO Pedido 
+            (ID_Pedido, Preco_t, Delivery, fk_Data_Data_PK)
+            VALUES (%s, %s, %s, %s);
+        ''', (id_pedido, preco_t, delivery, fk_data_data_pk))
+        conn.commit()
+        print("Pedido adicionado com sucesso!")
+    except Exception as e:
+        print(f"Erro ao adicionar pedido: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+def removeOrder(id_pedido):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM Pedido WHERE ID_Pedido = %s;', (id_pedido,))
+        conn.commit()
+        print("Pedido removido com sucesso!")
+    except Exception as e:
+        print(f"Erro ao remover pedido: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+def editOrder(id_pedido, updates):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    values = []
+    valuesFiltered = []
+    for column, value in updates.items():
+        if value is not None:
+            valuesFiltered.append(f"{column} = %s")
+            values.append(value)
+
+    if valuesFiltered:
+        query = f"UPDATE Pedido SET {','.join(valuesFiltered)} WHERE ID_Pedido = %s"
+        values.append(id_pedido)
+
+        try:
+            cursor.execute(query, tuple(values))
+            conn.commit()
+            print("Pedido editado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao editar pedido: {e}")
+            conn.rollback()
+        finally:
+            cursor.close()
+            conn.close()
+
+@route('/Orders')
+def view_orders():
+    tabelaPedidos = showOrders()
+    return template('views/Orders.tpl', tabelaPedidos=tabelaPedidos)
+
+@route('/createOrder', method=['POST'])
+def add_order():
+    id_pedido = request.forms.get('id_pedido')
+    preco_t = float(request.forms.get('preco_t'))
+    delivery = request.forms.get('delivery') == 'on'
+    fk_data_data_pk = request.forms.get('fk_data_data_pk')
+
+    addOrder(id_pedido, preco_t, delivery, fk_data_data_pk)
+    redirect('/Orders')
+
+@route('/removeOrder', method=['POST'])
+def delete_order():
+    id_pedido = request.forms.get('id_pedido')
+    removeOrder(id_pedido)
+    redirect('/Orders')
+
+@route('/editOrder', method=['POST'])
+def edit_order():
+    id_pedido = request.forms.get('id_pedido')
+    updates = {
+        "Preco_t": request.forms.get('preco_t'),
+        "Delivery": request.forms.get('delivery') == 'true', 
+        "fk_Data_Data_PK": request.forms.get('fk_data_data_pk')
+    }
+    updates = {k: v for k, v in updates.items() if v is not None}
+    editOrder(id_pedido, updates)
+    redirect('/Orders')
 
 
 if __name__ == '__main__':

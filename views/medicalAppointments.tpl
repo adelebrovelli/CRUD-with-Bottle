@@ -131,7 +131,7 @@
 </head>
 <body>
     <header>
-        <h1>Histórico de Consultas</h1>
+        <h1>Histórico de consultas</h1>
     </header>
 
     <table border="1">

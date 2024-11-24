@@ -132,7 +132,7 @@
 </head>
 <body>
     <header>
-        <h1>Histórico de Inscrições</h1>
+        <h1>Histórico de inscrições</h1>
     </header>
 
     <table border="1">
