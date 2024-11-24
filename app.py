@@ -1,9 +1,18 @@
 from bottle import route, run, template, request, redirect
 import datetime
 import psycopg2
+import os
+from dotenv import load_dotenv
 
-def get_db_connection(): # me conectando no postgres turma
-    conn = psycopg2.connect(database="dbequilibrium", user="postgres", password="9504", host='localhost', port=5432
+load_dotenv()
+
+def get_db_connection():
+    conn = psycopg2.connect(
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT')
     )
     return conn
 
@@ -430,9 +439,29 @@ def removeOrder(id_pedido):
         cursor.close()
         conn.close()
 
+def ensure_date_exists(data):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT 1 FROM Data WHERE Data_PK = %s', (data,))
+        if cursor.fetchone() is None:
+            cursor.execute('INSERT INTO Data (Data_PK) VALUES (%s)', (data,))
+            conn.commit()
+    except Exception as e:
+        print(f"Erro ao garantir a existência da data: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
 def editOrder(id_pedido, updates):
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # adiciona nova data se n tiver já
+    if "fk_Data_Data_PK" in updates:
+        ensure_date_exists(updates["fk_Data_Data_PK"])
+
     values = []
     valuesFiltered = []
     for column, value in updates.items():
@@ -443,7 +472,6 @@ def editOrder(id_pedido, updates):
     if valuesFiltered:
         query = f"UPDATE Pedido SET {','.join(valuesFiltered)} WHERE ID_Pedido = %s"
         values.append(id_pedido)
-
         try:
             cursor.execute(query, tuple(values))
             conn.commit()
@@ -454,6 +482,7 @@ def editOrder(id_pedido, updates):
         finally:
             cursor.close()
             conn.close()
+
 
 @route('/Orders')
 def view_orders():
