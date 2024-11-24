@@ -175,7 +175,6 @@ def showEventSubscriptions():
     
     return resultados_formatados
 
-
 @route('/EventSubscriptions')
 def view_inscricoes():
     tabelaInscricoes = showEventSubscriptions()
@@ -200,7 +199,6 @@ def addEventSubscriptions(fk_evento_data_evento, fk_participante_cpf):
         cursor.close()
         conn.close()
 
-
 @route('/createEventSubscriptions', method=['POST'])
 def add_inscricao():
     fk_evento_data_evento = request.forms.get('fk_evento_data_evento')
@@ -208,7 +206,6 @@ def add_inscricao():
 
     addEventSubscriptions(fk_evento_data_evento, fk_participante_cpf)
     redirect('/EventSubscriptions')
-
 
 def removeEventSubscriptions(id_inscricao):
     conn = get_db_connection()
@@ -266,6 +263,119 @@ def edit_inscricao():
     updates = {k: v for k, v in updates.items() if v}
     editEventSubscriptions(id_inscricao, updates)
     redirect('/EventSubscriptions')
+
+def showEvents():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Evento;')
+    resultados = cursor.fetchall()
+    conn.close()
+
+    resultados_formatados = []
+    for evento in resultados:
+        nova_evento = []
+        for campo in evento:
+            if isinstance(campo, bool): 
+                nova_evento.append('true' if campo else 'false')
+            elif isinstance(campo, (datetime.date, datetime.datetime)):
+                nova_evento.append(str(campo))
+            else:
+                nova_evento.append(campo)
+        resultados_formatados.append(nova_evento)
+    
+    return resultados_formatados
+
+def addEvent(nome_evento, data_evento, online, fk_local_id_local):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO Evento 
+            (Nome_Evento, Data_Evento, Online, fk_Local_ID_Local)
+            VALUES (%s, %s, %s, %s);
+        ''', (nome_evento, data_evento, online, fk_local_id_local))
+        conn.commit()
+        print("Evento adicionado com sucesso!")
+    except Exception as e:
+        print(f"Erro ao adicionar evento: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+def removeEvent(data_evento, fk_local_id_local):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM Evento WHERE Data_Evento = %s AND fk_local_id_local = %s', (data_evento, fk_local_id_local))
+        conn.commit()
+        print("Evento removido com sucesso!")
+    except Exception as e:
+        print(f"Erro ao remover evento: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+def editEvent(data_evento, updates):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    values = []
+    valuesFiltered = []
+    for column, value in updates.items():
+        if value is not None:
+            valuesFiltered.append(f"{column} = %s")
+            values.append(value)
+
+    if valuesFiltered:
+        query = f"UPDATE Evento SET {','.join(valuesFiltered)} WHERE Data_Evento = %s"
+        values.append(data_evento)
+
+        try:
+            cursor.execute(query, tuple(values))
+            conn.commit()
+            print("Evento editado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao editar evento: {e}")
+            conn.rollback()
+        finally:
+            cursor.close()
+            conn.close()
+
+@route('/Events')
+def view_events():
+    tabelaEventos = showEvents()
+    return template('views/Events.tpl', tabelaEventos=tabelaEventos)
+
+@route('/createEvent', method=['POST'])
+def add_event():
+    nome_evento = request.forms.get('nome_evento')
+    data_evento = request.forms.get('data_evento')
+    online = request.forms.get('online') == 'on'
+    fk_local_id_local = request.forms.get('fk_local_id_local')
+
+    addEvent(nome_evento, data_evento, online, fk_local_id_local)
+    redirect('/Events')
+
+@route('/removeEvent', method=['POST'])
+def delete_event():
+    data_evento = request.forms.get('data_evento')
+    fk_local_id_local = request.forms.get('fk_local_id_local')
+    removeEvent(data_evento, fk_local_id_local)
+    redirect('/Events')
+
+@route('/editEvent', method=['POST'])
+def edit_event():
+    data_evento = request.forms.get('data_evento')
+    updates = {
+        "Nome_Evento": request.forms.get('nome_evento'),
+        "Online": request.forms.get('online') == 'true',  
+        "fk_Local_ID_Local": request.forms.get('fk_local_id_local')
+    }
+    updates = {k: v for k, v in updates.items() if v is not None}  
+    editEvent(data_evento, updates)
+    redirect('/Events')
+
 
 
 

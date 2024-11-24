@@ -23,9 +23,17 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
         }
 
+        form {
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
         table {
             width: 100%;
             border-collapse: collapse;

@@ -22,7 +22,7 @@
         }
 
         header {
-            background-color: #4CAF50;
+            background-color: #6fbb9d;
             color: white;
             padding: 20px;
             text-align: center;
@@ -47,7 +47,7 @@
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #6fbb9d;
             color: white;
         }
 
@@ -71,7 +71,7 @@
         ul li a, ul li button, table tr td button {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #6fbb9d;
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -82,7 +82,7 @@
         }
 
         ul li button:hover, ul li a:hover {
-            background-color: #45a049;
+            background-color: #6fbb9d;
         }
 
         .modal {
@@ -126,7 +126,7 @@
         }
 
         .close-modal:hover {
-            background-color: darkred;
+            background-color: #6fbb9d;
         }
     </style>
 </head>
