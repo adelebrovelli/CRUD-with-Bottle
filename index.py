@@ -1,4 +1,4 @@
-from bottle import route, run, template, request, redirect
+from bottle import route, template, request, redirect
 import datetime
 import psycopg2
 import os
@@ -516,7 +516,3 @@ def edit_order():
     updates = {k: v for k, v in updates.items() if v is not None}
     editOrder(id_pedido, updates)
     redirect('/Orders')
-
-
-if __name__ == '__main__':
-    run(host='localhost', port=8080, debug=True, reloader=True) # lembrar de retirar e usar apenas para testes
