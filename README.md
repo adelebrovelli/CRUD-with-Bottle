@@ -44,3 +44,10 @@ O projeto inclui uma proposta única alinhada ao contexto da clínica psiquiátr
 - *Podcasts motivacionais:* Conteúdo voltado para motivação e saúde mental, oferecendo uma experiência complementar e enriquecedora.
 
 Embora essa funcionalidade não esteja implementada diretamente no sistema, ela reflete a filosofia do projeto, que busca criar um ambiente acolhedor e promover o bem-estar dos usuários.
+
+- ### Separação de Tarefas
+
+  Desenvolvimento: Adele e Maria Eduarda
+  Documentação: Maria Eduarda e Sérgio
+  Prototipagem do fluxo de telas: Adele e Bruna
+  Diferencial: Bruna
