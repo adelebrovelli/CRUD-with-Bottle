@@ -48,6 +48,9 @@ Embora essa funcionalidade não esteja implementada diretamente no sistema, ela 
 ### Separação de Tarefas
 
   Desenvolvimento: Adele e Maria Eduarda
+  
   Documentação: Maria Eduarda e Sérgio
+  
   Prototipagem do fluxo de telas: Adele e Bruna
+  
   Diferencial: Bruna
