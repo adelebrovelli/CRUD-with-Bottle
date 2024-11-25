@@ -10,6 +10,13 @@ handler = app
 
 load_dotenv()
 
+try:
+    from http.server import BaseHTTPRequestHandler
+    print("BaseHTTPRequestHandler loaded successfully.")
+except Exception as e:
+    print(f"Error loading BaseHTTPRequestHandler: {e}")
+
+
 def get_db_connection():
     conn = psycopg2.connect(
         database=os.getenv('DB_NAME'),
