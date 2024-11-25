@@ -11,7 +11,12 @@
       {
         "src": "/(.*)",
         "dest": "index.py"
+      },
+      {
+        "src": "/favicon.ico",
+        "dest": "/public/favicon.ico"
       }
+      
     ]
   }
   
