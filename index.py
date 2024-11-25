@@ -10,11 +10,9 @@ handler = app
 
 load_dotenv()
 
-try:
-    from http.server import BaseHTTPRequestHandler
-    print("BaseHTTPRequestHandler loaded successfully.")
-except Exception as e:
-    print(f"Error loading BaseHTTPRequestHandler: {e}")
+@app.route('/favicon.ico')
+def serve_favicon():
+    return '', 204 
 
 
 def get_db_connection():
