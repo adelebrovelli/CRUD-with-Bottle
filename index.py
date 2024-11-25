@@ -1,8 +1,13 @@
-from bottle import route, template, request, redirect
+from bottle import route, template, request, redirect, Bottle, run
 import datetime
 import psycopg2
 import os
 from dotenv import load_dotenv
+
+app = Bottle()
+
+def handler(request):
+    return app(request)
 
 load_dotenv()
 
@@ -27,7 +32,7 @@ PASSWORD_TABLES = {
 def credentials(password):
     return PASSWORD_TABLES.get(password)
 
-@route('/', method=['GET', 'POST'])
+@app.route('/', method=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         password = request.forms.get('password')  
@@ -121,12 +126,12 @@ def editMedicalAppointments(data, updates):
         print("Nenhum campo para atualizar")
 
 
-@route('/MedicalAppointments')
+@app.route('/MedicalAppointments')
 def homeMedicalAppointments():
     tabelaConsultas = showMedicalAppointments()
     return template('views/medicalAppointments.tpl', tabelaConsultas=tabelaConsultas)
 
-@route('/createMedicalAppointments', method=['GET', 'POST'])
+@app.route('/createMedicalAppointments', method=['GET', 'POST'])
 def add():
         fk_medico_crm = request.forms.get('fk_medico_crm')
         fk_medico_fk_pessoa_cpf = request.forms.get('fk_medico_fk_pessoa_cpf')
@@ -139,7 +144,7 @@ def add():
 
         redirect('/')
 
-@route('/removeMedicalAppointments', method =['GET', 'POST'])
+@app.route('/removeMedicalAppointments', method =['GET', 'POST'])
 def remove():
     fk_medico_crm = request.forms.get('fk_medico_crm')
     data = request.forms.get('data')
@@ -148,7 +153,7 @@ def remove():
 
     redirect('/')
 
-@route('/editMedicalAppointments', method=['POST'])
+@app.route('/editMedicalAppointments', method=['POST'])
 def edit():
     data = request.forms.get('data')
     updates = {
@@ -184,7 +189,7 @@ def showEventSubscriptions():
     
     return resultados_formatados
 
-@route('/EventSubscriptions')
+@app.route('/EventSubscriptions')
 def view_inscricoes():
     tabelaInscricoes = showEventSubscriptions()
     return template('views/Subscriptions.tpl', tabelaInscricoes=tabelaInscricoes)
@@ -208,7 +213,7 @@ def addEventSubscriptions(fk_evento_data_evento, fk_participante_cpf):
         cursor.close()
         conn.close()
 
-@route('/createEventSubscriptions', method=['POST'])
+@app.route('/createEventSubscriptions', method=['POST'])
 def add_inscricao():
     fk_evento_data_evento = request.forms.get('fk_evento_data_evento')
     fk_participante_cpf = request.forms.get('fk_participante_cpf')
@@ -229,7 +234,7 @@ def removeEventSubscriptions(id_inscricao):
         cursor.close()
         conn.close()
 
-@route('/removeEventSubscriptions', method=['POST'])
+@app.route('/removeEventSubscriptions', method=['POST'])
 def delete_inscricao():
     id_inscricao = request.forms.get('id_inscricao')
     removeEventSubscriptions(id_inscricao)
@@ -260,7 +265,7 @@ def editEventSubscriptions(id_inscricao, updates):
             cursor.close()
             conn.close()
 
-@route('/editEventSubscriptions', method=['POST'])
+@app.route('/editEventSubscriptions', method=['POST'])
 def edit_inscricao():
     id_inscricao = request.forms.get('id_inscricao')
     updates = {
@@ -351,12 +356,12 @@ def editEvent(data_evento, updates):
             cursor.close()
             conn.close()
 
-@route('/Events')
+@app.route('/Events')
 def view_events():
     tabelaEventos = showEvents()
     return template('views/Events.tpl', tabelaEventos=tabelaEventos)
 
-@route('/createEvent', method=['POST'])
+@app.route('/createEvent', method=['POST'])
 def add_event():
     nome_evento = request.forms.get('nome_evento')
     data_evento = request.forms.get('data_evento')
@@ -366,14 +371,14 @@ def add_event():
     addEvent(nome_evento, data_evento, online, fk_local_id_local)
     redirect('/Events')
 
-@route('/removeEvent', method=['POST'])
+@app.route('/removeEvent', method=['POST'])
 def delete_event():
     data_evento = request.forms.get('data_evento')
     fk_local_id_local = request.forms.get('fk_local_id_local')
     removeEvent(data_evento, fk_local_id_local)
     redirect('/Events')
 
-@route('/editEvent', method=['POST'])
+@app.route('/editEvent', method=['POST'])
 def edit_event():
     data_evento = request.forms.get('data_evento')
     updates = {
@@ -484,12 +489,12 @@ def editOrder(id_pedido, updates):
             conn.close()
 
 
-@route('/Orders')
+@app.route('/Orders')
 def view_orders():
     tabelaPedidos = showOrders()
     return template('views/Orders.tpl', tabelaPedidos=tabelaPedidos)
 
-@route('/createOrder', method=['POST'])
+@app.route('/createOrder', method=['POST'])
 def add_order():
     id_pedido = request.forms.get('id_pedido')
     preco_t = float(request.forms.get('preco_t'))
@@ -499,13 +504,13 @@ def add_order():
     addOrder(id_pedido, preco_t, delivery, fk_data_data_pk)
     redirect('/Orders')
 
-@route('/removeOrder', method=['POST'])
+@app.route('/removeOrder', method=['POST'])
 def delete_order():
     id_pedido = request.forms.get('id_pedido')
     removeOrder(id_pedido)
     redirect('/Orders')
 
-@route('/editOrder', method=['POST'])
+@app.route('/editOrder', method=['POST'])
 def edit_order():
     id_pedido = request.forms.get('id_pedido')
     updates = {
