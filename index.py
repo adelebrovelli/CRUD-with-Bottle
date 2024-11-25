@@ -4,10 +4,9 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 
-app = Bottle()
 
-def handler(request):
-    return app(request)
+app = Bottle()
+handler = app
 
 load_dotenv()
 
